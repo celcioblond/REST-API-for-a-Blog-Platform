@@ -7,12 +7,18 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getPosts = async (_req, res, next) => {
+export const getPosts = async (req, res, next) => {
+  const currentPage = req.query.page || 1;
+  const perPage = 2;
   try {
-    const posts = await Post.find();
+    const totalItems = await Post.countDocuments();
+    const posts = await Post.find()
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage);
     res.status(200).json({
-      message: "Fetched posts",
-      posts
+      message: "Fetched posts successfully",
+      posts,
+      totalItems,
     });
   } catch (error) {
     if (!error.statusCode) {
