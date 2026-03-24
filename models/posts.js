@@ -10,14 +10,13 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   content: {
-    type: String, 
+    type: String,
     required: true,
   },
   creator: {
     type: Object,
-    required: String
+    required: true
   }
-}, {timestamps: true}
-);
+}, { timestamps: true });
 
-export default Post = mongoose.model("Post", postSchema);
+export const Post = mongoose.model("Post", postSchema);

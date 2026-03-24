@@ -1,30 +1,52 @@
 import express from "express";
 import feedRoutes from "../routes/feed.js";
-import bodyParser from "body-parser";
 import connectDB from "../config/db.js";
 import dotenv from "dotenv";
 import path from "path";
+import multer from "multer";
+import { fileURLToPath } from "url";
 
 dotenv.config();
-console.log("URI: ", process.env.MONGODB_URI);
 const PORT = process.env.PORT;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.use(express.json());
-app.use("/images", express.static(path.join(__dirname, 'images')));
-app.use("/feed", feedRoutes)
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("image"));
+app.use("/images", express.static(path.join(__dirname, "images")));
+app.use("/feed", feedRoutes);
 app.use((error, req, res, next) => {
   console.log(error);
-  const {status} = error.statusCode || 500;
-  const {message} = error.message;
-  res.status(status).json({
-    message
-  });
-})
+  const status = error.statusCode || 500;
+  const message = error.message;
+  res.status(status).json({ message });
+});
 
-connectDB().then(() => {
+const start = async () => {
+  await connectDB();
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
-});
+};
+
+start();
