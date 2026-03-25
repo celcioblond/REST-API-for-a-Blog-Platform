@@ -10,21 +10,21 @@ const router = express.Router();
 router.get("/posts",isAuth, getPosts);
 
 //POST /feed/post
-router.post("/post", [
+router.post("/post", isAuth, [
   body('title').trim().isLength({min: 5 }),
   body('content').trim().isLength({min: 5}),
 ], createPost);
 
 //GET for single post
-router.get("/post/:postId", getPost);
+router.get("/post/:postId", isAuth, getPost);
 
 //Edit posts
-router.put("/post/:postId", [
+router.put("/post/:postId", isAuth, [
   body('title').trim().isLength({min: 5 }),
   body('content').trim().isLength({min: 5}),
 ], updatePost);
 
 //delete posts
-router.delete("/post/:postId", deletePost);
+router.delete("/post/:postId", isAuth, deletePost);
 
 export default router;

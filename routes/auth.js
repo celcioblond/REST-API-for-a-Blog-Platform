@@ -5,7 +5,7 @@ import {signup, login} from "../controllers/auth.js";
 
 const router = express.Router();
 
-router.put("/signup", [
+router.post("/signup", [
   body("email")
     .isEmail().withMessage("Please enter a valid email")
     .custom(async (value) => {
